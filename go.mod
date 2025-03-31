@@ -3,7 +3,7 @@ module github.com/SetUpOrganization/users-service
 go 1.24.1
 
 require (
-	github.com/SetUpOrganization/protos v0.0.0-20250331190309-284cff9fb832
+	github.com/SetUpOrganization/protos v0.0.0-20250331210530-7bd7ae66043f
 	google.golang.org/grpc v1.71.0
 )
 
