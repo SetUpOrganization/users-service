@@ -10,9 +10,12 @@ RUN go build -o ./bin/run_app ./cmd/main/main.go
 FROM alpine:3.20 AS runner
 WORKDIR /app
 
+COPY --from=builder /app/internal/infrastructure/db/migrations/ ./migrations
 COPY --from=builder /app/bin ./
-RUN adduser -DH usr && chown -R usr: /app && chmod -R 700 /app
 
-USER usr
- 
-CMD [ "./run_app" ]
+# Install goose for db migrations
+RUN wget -O /usr/local/bin/goose https://github.com/pressly/goose/releases/download/v3.24.1/goose_linux_x86_64
+RUN chmod +x /usr/local/bin/goose
+
+# Migrate db and run server
+CMD ["sh", "-c", "goose -dir ./migrations postgres $DATABASE_URL up && ./run_app"]
