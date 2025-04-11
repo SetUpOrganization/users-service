@@ -37,15 +37,13 @@ func (s *server) SignUp(ctx context.Context, req *users.SignUpRequest) (*users.S
 	return &users.SignUpResponse{Success: true, Message: fmt.Sprintf("Successfully registered user with name %s and id %s", createdUser.Name, createdUser.ID)}, nil
 }
 
-func StartGRPCServer(port string) error {
-	lis, err := net.Listen("tcp", ":"+port)
+func StartGRPCServer(cfg *config.Config) error {
+	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
 		return err
 	}
 
 	s := grpc.NewServer()
-
-	cfg := config.NewConfig()
 
 	// Init db connection
 	conn, err := InitDB(context.Background(), cfg.DatabaseURL)
@@ -64,7 +62,7 @@ func StartGRPCServer(port string) error {
 	}
 	users.RegisterUsersServer(s, &serv)
 
-	slog.Info(fmt.Sprintf("gRPC server listening on %s", port))
+	slog.Info(fmt.Sprintf("gRPC server listening on %s", cfg.GRPCPort))
 	return s.Serve(lis)
 }
 
