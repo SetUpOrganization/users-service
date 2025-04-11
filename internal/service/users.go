@@ -5,10 +5,11 @@ import (
 	"github.com/SetUpOrganization/users-service/internal/models"
 	"github.com/SetUpOrganization/users-service/internal/repo"
 	"github.com/go-playground/validator/v10"
+	"net/http"
 )
 
 type UsersService interface {
-	CreateUser(ctx context.Context, user models.CreateUser) (*models.User, error)
+	CreateUser(ctx context.Context, user models.CreateUser) (*models.User, *models.HTTPError)
 }
 
 type usersService struct {
@@ -23,10 +24,21 @@ func NewUsersService(repo repo.UsersRepository) UsersService {
 	}
 }
 
-func (s *usersService) CreateUser(ctx context.Context, user models.CreateUser) (*models.User, error) {
+func (s *usersService) CreateUser(ctx context.Context, user models.CreateUser) (*models.User, *models.HTTPError) {
 	err := s.validate.Struct(user)
 	if err != nil {
-		return nil, err
+		return nil, &models.HTTPError{
+			Status:  http.StatusBadRequest,
+			Message: err.Error(),
+		}
 	}
-	return s.repo.CreateUser(ctx, user)
+
+	createdUser, err := s.repo.CreateUser(ctx, user)
+	if err != nil {
+		return nil, &models.HTTPError{
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return createdUser, nil
 }

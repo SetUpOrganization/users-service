@@ -31,7 +31,7 @@ func (s *server) SignUp(ctx context.Context, req *users.SignUpRequest) (*users.S
 
 	createdUser, err := s.service.CreateUser(ctx, user)
 	if err != nil {
-		return &users.SignUpResponse{Success: false, Message: "Some error"}, err // TODO: normal error handling
+		return &users.SignUpResponse{Success: false, Message: err.Message}, err.Err()
 	}
 
 	return &users.SignUpResponse{Success: true, Message: fmt.Sprintf("Successfully registered user with name %s and id %s", createdUser.Name, createdUser.ID)}, nil
