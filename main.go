@@ -54,6 +54,7 @@ func main() {
 					htmlContent, _ := row.DOM.Find(fmt.Sprintf("td.column-%d", col)).Html()
 					data := ReplaceFirstSubTag(htmlContent)
 					rowForWrite = append(rowForWrite, cleanCSVValue(data))
+					
 					continue
 				}
 
